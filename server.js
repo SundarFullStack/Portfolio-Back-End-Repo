@@ -5,7 +5,6 @@ const router = require("./Routers/Route");
 const cors = require("cors");
 require("./Database/Dbconn");
 
-
 app.use(express.json());
 app.use(cors());
 app.use("/api/", router);

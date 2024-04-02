@@ -9,24 +9,27 @@ const nodemailer = require("nodemailer");
 //For Viewers Addition
 
 router.post("/sendEmail", async (req, res) => {
-  const { fname, email, message } = req.body;
-  //   console.log(fname, email, message);
-  if (!fname || !email || !message) {
-    res.status(422).json({
-      success: false,
-      message: "Fill All the details properly in body ",
-    });
-  }
+
+ 
 
   try {
 
-    //Validating Existing User or Not and Save their Credentials
-    const preuser = await portfolioDb.findOne({ email: email });
+    const { fname, email, message } = req.body;
+  //   console.log(fname, email, message);
 
-    if (preuser) {
-      res.status(422).json({
+
+    const ExistUser = await portfolioDb.findOne({email:email})
+
+    if (!fname || !email || !message) {
+      res.status(201).json({
         success: false,
-        message: "This Email Already Exist!!",
+        message: "Fill All the details properly in body ",
+      });
+    }
+    else if (ExistUser) {
+      res.status(201).json({
+        success: false,
+        message: "Provided email id already saved",
       });
     } else {
       const finalViewer = new portfolioDb({
@@ -41,13 +44,13 @@ router.post("/sendEmail", async (req, res) => {
       var transporter = nodemailer.createTransport({
         service: "gmail",
         auth: {
-          user: process.env.EMAIL,
-          pass: process.env.PASSWORD,
+          user: process.env.Nodemailer_UserName,
+          pass: process.env.Nodemailer_Password,
         },
       });
 
       var mailOptions = {
-        from: process.env.EMAIL,
+        from: process.env.Nodemailer_UserName,
         to: "sundermeenakshi15055@gmail.com",
         subject: "Sending Email using Node.js",
         text: `Viewer Name: ${fname}, Email: ${email},Message:${message}`,
@@ -72,7 +75,7 @@ router.post("/sendEmail", async (req, res) => {
     }
   } catch (error) {
     res.status(422).json(error);
-    console.log("catch block error");
+    console.log("catch block error",error);
   }
 });
 
